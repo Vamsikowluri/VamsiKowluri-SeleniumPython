@@ -2,4 +2,11 @@
 # https://www.rahulshettyacademy.com/angularpractice/shop
 # https://www.rahulshettyacademy.com/AutomationPractice/
 # https://www.rahulshettyacademy.com/dropdownsPractise/
-# https://www.rahulshettyacademy.com/seleniumPractise/#/
+# https://www.rahulshettyacademy.com/seleniumPractise/
+
+# CSS - a[href*='-Partial values-'] (or) Xpath - //a[@href='-full value-'] (or) //a[contains(@href,'--')]
+
+
+
+
+

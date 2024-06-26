@@ -1,4 +1,6 @@
-a = 10
-b = 5
+import pyautogui
 
-print(a+b)
+pyautogui.rightClick(x=moveToX, y=moveToY)
+pyautogui.middleClick(x=moveToX, y=moveToY)
+pyautogui.doubleClick(x=moveToX, y=moveToY)
+pyautogui.tripleClick(x=moveToX, y=moveToY)

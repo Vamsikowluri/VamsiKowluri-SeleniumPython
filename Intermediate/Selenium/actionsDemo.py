@@ -1,7 +1,6 @@
 import time
-
 from selenium import webdriver
-from selenium.webdriver import ActionChains
+from selenium.webdriver import Keys
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 
@@ -9,11 +8,25 @@ service_obj = Service()
 driver = webdriver.Chrome(service=service_obj)
 driver.maximize_window()
 
-# driver.implicitly_wait(5)
-time.sleep(5)
-driver.get("https://www.rahulshettyacademy.com/AutomationPractice/")
-action = ActionChains(driver)
-time.sleep(5)
-action.move_to_element(driver.find_element(By.ID, "mousehover")).perform()
-time.sleep(5)
-action.context_click(driver.find_element(By.LINK_TEXT, "Top")).perform()
+driver.get("https://www.rahulshettyacademy.com/dropdownsPractise/")
+driver.find_element(By.ID, "autosuggest").send_keys("ind")
+time.sleep(2)
+
+countries = driver.find_elements(By.CSS_SELECTOR, "li[class='ui-menu-item'] a")
+print(len(countries))
+
+for country in countries:
+    if country.text == "India":
+        country.click()
+        break
+
+time.sleep(2)
+print(driver.title)
+
+assert driver.find_element(By.ID, "autosuggest").get_attribute("value") == "India"
+driver.close()
+driver.quit()
+
+
+
+

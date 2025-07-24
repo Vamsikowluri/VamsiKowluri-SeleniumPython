@@ -1,63 +1,146 @@
-import time
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
+import sys
+import traceback
+import getopt
+import os
 
-service_obj = Service()
-driver = webdriver.Chrome(service=service_obj)
-driver.maximize_window().
-driver.maximize_window()
+ERROR_WRONG_USAGE = 1
+ERROR_NO_PIP = 2
+ERROR_NO_SETUPTOOLS = 3
+ERROR_EXCEPTION = 4
 
-wait_time = 5
+os.putenv("PIP_REQUIRE_VIRTUALENV", "false")
 
-driver.get("https://www.amazon.in/")
+def exit(retcode):
+    major, minor, micro, release, serial = sys.version_info
+    version = major * 10 + minor
+    if version < 25:
+        import os
+        os._exit(retcode)
+    else:
+        sys.exit(retcode)
 
-time.sleep(wait_time)
 
-print(driver.title)
+def usage():
+    sys.stderr.write('Usage: packaging_tool.py <list|install|uninstall|pyvenv>\n')
+    sys.stderr.flush()
+    exit(ERROR_WRONG_USAGE)
 
-driver.find_element(By.XPATH, "//input[@id='twotabsearchtextbox']").send_keys("Headset")
 
-driver.find_element(By.XPATH, "//input[@id='nav-search-submit-button']").click()
+def error(message, retcode):
+    sys.stderr.write('Error: %s\n' % message)
+    sys.stderr.flush()
+    exit(retcode)
 
-time.sleep(wait_time)
 
-driver.find_element(By.XPATH, "//*[@id='p_89/JBL']/span/a").click()
+def error_no_pip():
+    type, value, tb = sys.exc_info()
+    if tb is not None and tb.tb_next is None:
+        error("Python packaging tool 'pip' not found", ERROR_NO_PIP)
+    else:
+        error(traceback.format_exc(), ERROR_EXCEPTION)
 
-time.sleep(wait_time)
 
-driver.find_element(By.XPATH, "//span[@class='a-size-base-plus a-color-base a-text-normal']").click()
+def do_list():
+    if sys.version_info < (3, 10):
+        try:
+            import pkg_resources
+        except ImportError:
+            error("Python packaging tool 'setuptools' not found", ERROR_NO_SETUPTOOLS)
+        for pkg in pkg_resources.working_set:
+            try:
+                requirements = pkg.requires()
+            except Exception:
+                requirements = []
+            requires = ':'.join([str(x) for x in requirements])
+            sys.stdout.write('\t'.join([pkg.project_name, pkg.version, pkg.location, requires])+chr(10))
+    else:
+        import importlib.metadata
+        for pkg in importlib.metadata.distributions():
+            try:
+                requirements = [] if (pkg.requires is None) else pkg.requires
+            except Exception:
+                requirements = []
+            requires = ':'.join([str(x) for x in requirements])
+            if pkg.name is None or pkg.version is None or pkg._path is None:
+                continue
+            sys.stdout.write('\t'.join([pkg.name, pkg.version, str(pkg._path.parent), requires])+chr(10))
+    sys.stdout.flush()
 
-time.sleep(wait_time)
 
-windowsOpened = driver.window_handles
+def do_install(pkgs):
+    run_pip(['install'] + pkgs)
 
-driver.switch_to.window(windowsOpened[1])
 
-message = driver.find_element(By.XPATH, "//span[@id='productTitle']").text
+def do_uninstall(pkgs):
+    run_pip(['uninstall', '-y'] + pkgs)
 
-time.sleep(wait_time)
 
-print(message)
+def run_pip(args):
+    import runpy
+    sys.argv[1:] = args
+    # pip.__main__ has been around since 2010 but support for executing it automatically
+    # was added in runpy.run_module only in Python 2.7/3.1
+    module_name = 'pip.__main__' if sys.version_info < (2, 7) else 'pip'
+    try:
+        runpy.run_module(module_name, run_name='__main__', alter_sys=True)
+    except ImportError:
+        error_no_pip()
 
-# page = input("Product name \n")
-# if page == message:
-#     print(page)
-#     driver.find_element(By.ID, "productTitle").click()
-#     message2 = "Automated successfully"
-#     print(message2)
-# else:
-#     message3 = "Fail"
-#     print(message3)
 
-driver.find_element(By.XPATH, "//td[@class='a-size-base']").click()
+def do_pyvenv(args):
+    import runpy
+    try:
+        import ensurepip
+        sys.argv[1:] = args
+    except ImportError:
+        sys.argv[1:] = ['--without-pip'] + args
 
-driver.find_element(By.XPATH, "//div[@id='cm_cr_dp_d_rating_histogram']").click()
+    try:
+        runpy.run_module('venv', run_name='__main__', alter_sys=True)
+    except ImportError:
+        error("Standard Python 'venv' module not found", ERROR_EXCEPTION)
 
-time.sleep(wait_time)
 
-message = "Automated succesfully"
+def main():
+    try:
+        # As a workaround for #885 in setuptools, don't expose other helpers
+        # in sys.path so as not no confuse it with possible combination of
+        # namespace/ordinary packages
+        sys.path.remove(os.path.dirname(__file__))
+    except ValueError:
+        pass
 
-print(message)
+    try:
+        if len(sys.argv) < 2:
+            usage()
+        cmd = sys.argv[1]
+        if cmd == 'list':
+            if len(sys.argv) != 2:
+                usage()
+            do_list()
+        elif cmd == 'install':
+            if len(sys.argv) < 2:
+                usage()
 
-time.sleep(wait_time)
+            pkgs = sys.argv[2:]
+            do_install(pkgs)
+
+        elif cmd == 'uninstall':
+            if len(sys.argv) < 2:
+                usage()
+            pkgs = sys.argv[2:]
+            do_uninstall(pkgs)
+        elif cmd == 'pyvenv':
+            opts, args = getopt.getopt(sys.argv[2:], '', ['system-site-packages'])
+            if len(args) != 1:
+                usage()
+            do_pyvenv(sys.argv[2:])
+        else:
+            usage()
+    except Exception:
+        traceback.print_exc()
+        exit(ERROR_EXCEPTION)
+
+
+if __name__ == '__main__':
+    main()

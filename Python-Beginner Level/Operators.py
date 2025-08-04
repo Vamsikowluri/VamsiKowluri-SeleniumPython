@@ -81,8 +81,3 @@ for i in range(1, 6):
         product = i * j
         print(f"{i} x {j} = {product}")
     print()  # Print a new line for better readability
-
-
-
-
-

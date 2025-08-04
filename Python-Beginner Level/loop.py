@@ -3,6 +3,7 @@ i = 1
 while i < 8:
   print(i)
   i += 1
+
 #using break condition
 i = 1
 while i < 6:
@@ -10,6 +11,7 @@ while i < 6:
   if i == 5:
     break
   i += 1
+
 #continue
   i = 0
   while i < 6:
@@ -17,6 +19,7 @@ while i < 6:
     if i == 3:
       continue
     print(i)
+
 #else stmt
 i = 1
 while i < 6:
@@ -49,7 +52,5 @@ number=6
 for j in range(1,6):
     summation = number + j
 print(summation)
-
-
 for k in range(1,5):
   print (k ** 2)

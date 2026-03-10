@@ -1,32 +1,34 @@
-# #Numeric
-# var=5
-# print(var, 'is a type of', type(var))
-#
-# val= 2.0
-# print(val, 'is a type of', type(val))
-#
-# imaginary=1+2j
-# print(imaginary, 'is a type of', type(imaginary))
-#
-# #String
-# name='selenium with python'#"Selenium with python"
-# print(name)
-# #String converted into int
-# value="24"
-# converted_value=int(value)
-# print(value)
-# #String convert into float
-# type="45.90"
-# converted_type=float(type)
-# print(type)
+#Numeric
+var=5
+print(var, 'is a type of', type(var))
 
-#List
-#Fruits=['pineapple','banana','apple','cherry'] #allows duplicates
-#print(Fruits)
-#print(Fruits[3]) #based on the index
-#Fruits[2]="Grapes" #change the values in list
-#print(Fruits)
-#if condition
+val= 2.0
+print(val, 'is a type of', type(val))
+
+imaginary=1+2j
+print(imaginary, 'is a type of', type(imaginary))
+
+#String
+name='selenium with python'#"Selenium with python"
+print(name)
+#String converted into int
+value="24"
+converted_value=int(value)
+print(value)
+
+#String convert into float
+typed="45.90"
+converted_type=float(typed)
+print(typed)
+
+# List
+# Fruits=['pineapple','banana','apple','cherry'] #allows duplicates
+# print(Fruits)
+# print(Fruits[3]) #based on the index
+# Fruits[2]="Grapes" #change the values in list
+# print(Fruits)
+# if condition
+
 Fruits= ("apple", "banana", "cherry")
 if "apple" in Fruits:
         print("Yes apple is in the fruits list")

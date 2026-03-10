@@ -18,7 +18,7 @@ driver.find_element(By.XPATH, "//form/div[1]/input").send_keys("demo@gmail.com")
 # driver.find_element(By.CSS_SELECTOR, "form div:nth-child(2) input").send_keys("Hello@1234")
 driver.find_element(By.XPATH, "//type=password").send_keys("Hello@1234")
 
-# In css for id we can use #
+# In CSS for id we can use #
 driver.find_element(By.CSS_SELECTOR, "#confirmPassword").send_keys("Hello@1234")
 time.sleep(5)
 driver.find_element(By.XPATH, "//button[@type='submit']").click()

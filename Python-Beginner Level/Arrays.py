@@ -26,20 +26,6 @@ print(sample)
 sample.remove("Name")
 print(sample)
 
-#clear() method
-test=["1233","Try","6789","There"]
-print(test)
-test.clear()
-print("Array Test Is Empty",test)
-
 #count
 b=sample.count("Name")
 print(b)   #index starting with zero
-
-#copy()
-w=cars.copy()
-print(cars)
-
-#extend adding specific elements at the end of the list
-sample.extend(cars)
-print(sample)
